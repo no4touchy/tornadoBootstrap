@@ -1,7 +1,5 @@
-#!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 
-import tornado.ioloop, tornado.web, tornado.autoreload, tornado.options
 import random, shelve, os
 
 class Session:
@@ -23,28 +21,14 @@ class Session:
         raise AttributeError("Invalid key!")
 
 class SessionManager:
-    def open(self, fname):
+    def __init__(self, fname):
         self.fname = fname
         self.shelf = shelve.open(fname, writeback=True)
+    def open(fname):
+        return SessionManager(fname)
     def close(self):
         self.shelf.close()
         os.remove(self.fname)
     def genId(self, size, blocks):
         alphabet = "qazwsxedcrfvtgbyhnujmikolpQAZWSXEDCRFVTGBYHNUJMIKOLP0123456789"
         return "-".join("".join(random.choice(alphabet) for i in range(size)) for j in range(blocks))
-
-class MainHandler(tornado.web.RequestHandler):
-    def get(self, *args):
-        self.write("Hello World!<br />\n")
-        self.write("{}<br />\n".format(SessionManager.genId(0, 6, 5)))
-        self.write("{}<br />\n".format(args))
-
-if __name__ == "__main__":
-    tornado.options.parse_command_line()
-    application = tornado.web.Application([
-        (r"/", MainHandler)
-    ])
-    application.listen(8888)
-    ioloop = tornado.ioloop.IOLoop.instance()
-    tornado.autoreload.start(ioloop)
-    ioloop.start()
