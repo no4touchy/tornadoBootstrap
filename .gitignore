@@ -1,4 +1,5 @@
 nohup.out
 __pycache__/
-sessions
+tmpl/node_modules
+data/
 *.swp

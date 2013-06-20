@@ -1,0 +1,57 @@
+{
+    "body": "
+        <div class=\"container-fluid\">
+            <div class=\"row-fluid\">
+                <div class=\"offset1 span8\">
+                    <div class=\"well well-small\">
+                        <div class=\"panel\">
+                            Chat
+                        </div><!-- /.panel -->
+                    </div><!-- /.well /.well-small -->
+                </div><!-- /.offset1 /.span8 -->
+                <div class=\"span2\">
+                    <div class=\"well well-small\">
+                        <div class=\"panel\">
+                            Users
+                        </div><!-- /.panel -->
+                    </div><!-- /.well /.well-small -->
+                </div><!-- /.span2 -->
+            </div><!-- /.row-fluid -->
+            <div class=\"row-fluid\">
+                <div class=\"offset1 span10\">
+                    <div class=\"prompt\">
+                        <form class=\"form-inline\">
+                            <input type=\"text\" class=\"span11\">
+                            <button type=\"submit\" class=\"btn pull-right\">Send</button>
+                        </form><!-- /.form-inline -->
+                    </div><!-- /.prompt -->
+                </div><!-- /.offset1 /.span10 -->
+            </div><!-- /.row-fluid -->
+        </div> <!-- /.container-fluid -->
+    ",
+    "js": "
+        function updateHeight(tag){
+            $(\".panel\").height($(window).height() - 140);
+            $(\".prompt > .form-inline > .span11\").width($(\".prompt\").width() - $(\".prompt > .form-inline > .btn\").width() - 50);
+        } 
+        $(document).ready(updateHeight);
+        $(window).resize(updateHeight);
+
+        var obj = $(\".span8 > .well > .panel\");
+        obj.css(\"overflow-y\", \"auto\");
+        obj.scrollTop(obj[0].scrollHeight);
+        for(var i = 0;i < 150;i++){
+            obj.append(\"<p>Test \" + i + \"</p>\");
+        }
+    ",
+    "css": "
+        body {
+            padding-top: 40px;
+            background-color: #f5f5f5;
+        }
+        .panel {
+            background-color: #555;
+        }
+    ",
+    "title": "ChatApp &middot; Chat Window"
+}

@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-import random, shelve, os
+import random, shelve
 
 class Session:
     def __init__(self, id):
@@ -28,7 +28,11 @@ class SessionManager:
         return SessionManager(fname)
     def close(self):
         self.shelf.close()
-        os.remove(self.fname)
+        #os.remove(self.fname)
+    def new(self):
+        id = SessionManager.genId(6, 5)
+        self.shelf[id] = Session(id)
+        return id
     def genId(self, size, blocks):
         alphabet = "qazwsxedcrfvtgbyhnujmikolpQAZWSXEDCRFVTGBYHNUJMIKOLP0123456789"
         return "-".join("".join(random.choice(alphabet) for i in range(size)) for j in range(blocks))
