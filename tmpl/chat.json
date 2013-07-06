@@ -20,7 +20,7 @@
                 <div class=\"offset1 span10\">
                     <div class=\"prompt\">
                         <form id=\"form\" class=\"form-inline\">
-                            <input id=\"prompt\" type=\"text\">
+                            <input id=\"prompt\" type=\"text\" class=\"span11\">
                             <a id=\"submit\" class=\"btn pull-right\">Send</a>
                         </form><!-- /.form-inline -->
                     </div><!-- /.prompt -->
@@ -60,6 +60,7 @@
             event.preventDefault();
             var prompt = $(\"#prompt\");
             chat.append(\"<p>Me: \" + prompt.val() + \"</p>\");
+            chat.scrollTop(chat[0].scrollHeight);
             sock.send(JSON.stringify({\"action\" : \"msg\", \"msg\" : prompt.val()}));
             prompt.val(\"\");
         }
@@ -73,7 +74,7 @@
         $(document).ready(function(){
             chat = $(\".span8 > .well > .panel\").css(\"overflow-y\", \"auto\");
             panel = $(\".span2 > .well > .panel\").css(\"overflow-y\", \"auto\");
-            sock = new WebSocket(\"ws://localhost:8888/ws\");
+            sock = new WebSocket(window.location.href.split(\"?\")[0].replace(\"http\", \"ws\") + \"ws\");
 
             $(\"#loginForm\").submit(function(event){
                 event.preventDefault();
