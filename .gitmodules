@@ -1,0 +1,3 @@
+[submodule "tmpl/bootstrap"]
+	path = tmpl/bootstrap
+	url = https://github.com/twitter/bootstrap.git
