@@ -5,14 +5,13 @@
                 <div class=\"offset1 span8\">
                     <div class=\"well well-small\">
                         <div class=\"panel\">
-                            Chat
                         </div><!-- /.panel -->
                     </div><!-- /.well /.well-small -->
                 </div><!-- /.offset1 /.span8 -->
                 <div class=\"span2\">
                     <div class=\"well well-small\">
                         <div class=\"panel\">
-                            Users
+                            <p><b>Users</b></p>
                         </div><!-- /.panel -->
                     </div><!-- /.well /.well-small -->
                 </div><!-- /.span2 -->
@@ -20,38 +19,94 @@
             <div class=\"row-fluid\">
                 <div class=\"offset1 span10\">
                     <div class=\"prompt\">
-                        <form class=\"form-inline\">
-                            <input type=\"text\" class=\"span11\">
-                            <button type=\"submit\" class=\"btn pull-right\">Send</button>
+                        <form id=\"form\" class=\"form-inline\">
+                            <input id=\"prompt\" type=\"text\">
+                            <a id=\"submit\" class=\"btn pull-right\">Send</a>
                         </form><!-- /.form-inline -->
                     </div><!-- /.prompt -->
                 </div><!-- /.offset1 /.span10 -->
             </div><!-- /.row-fluid -->
         </div> <!-- /.container-fluid -->
+
+        <div id=\"loginModal\" class=\"modal hide fade\" tabindex=\"-1\" role=\"dialog\" aria-labelledby=\"loginModalLabel\" aria-hidden=\"true\">
+            <div class=\"modal-header\">
+                <h3 id=\"loginModalLabel\">Login ...</h3>
+            </div><!-- /.modal-header -->
+            <div class=\"modal-body\">
+                <form id=\"loginForm\" class=\"form-inline\">
+                    <input id=\"loginPrompt\" type=\"text\" class=\"\">
+                    <a id=\"loginSubmit\" class=\"btn pull-right\" onClick=\"$('#loginForm').submit();\">Send</a>
+                </form><!-- /.form-inline -->
+            </div><!-- /.modal-body -->
+            <div class=\"modal-footer\">
+            </div><!-- /.modal-footer -->
+        </div><!-- /.modal /.hide /.fade -->
     ",
     "js": "
-        function updateHeight(tag){
-            $(\".panel\").height($(window).height() - 140);
-            $(\".prompt > .form-inline > .span11\").width($(\".prompt\").width() - $(\".prompt > .form-inline > .btn\").width() - 50);
-        } 
+        var chat, panel, sock;
+        var loggedIn = false;
         $(document).ready(updateHeight);
         $(window).resize(updateHeight);
 
-        var obj = $(\".span8 > .well > .panel\");
-        obj.css(\"overflow-y\", \"auto\");
-        obj.scrollTop(obj[0].scrollHeight);
-        for(var i = 0;i < 150;i++){
-            obj.append(\"<p>Test \" + i + \"</p>\");
+        function updateHeight(tag){
+            $(\".panel\").height($(window).height() - 140);
+            $(\".prompt > .form-inline > .span11\").width($(\".prompt\").width() - $(\".prompt > .form-inline > .btn\").width() - 50);
         }
+
+        function submit(event){
+            if(!loggedIn){
+                return loggedIn;
+            }
+            event.preventDefault();
+            var prompt = $(\"#prompt\");
+            chat.append(\"<p>Me: \" + prompt.val() + \"</p>\");
+            sock.send(JSON.stringify({\"action\" : \"msg\", \"msg\" : prompt.val()}));
+            prompt.val(\"\");
+        }
+
+        function login(form){
+            $('#loginModal').modal('hide');
+            sock.send(JSON.stringify({\"action\" : \"login\", \"msg\" : $(\"#loginPrompt\", form).val()}));
+            loggedIn = true;
+        }
+
+        $(document).ready(function(){
+            chat = $(\".span8 > .well > .panel\").css(\"overflow-y\", \"auto\");
+            panel = $(\".span2 > .well > .panel\").css(\"overflow-y\", \"auto\");
+            sock = new WebSocket(\"ws://localhost:8888/ws\");
+
+            $(\"#loginForm\").submit(function(event){
+                event.preventDefault();
+                login($(\"#loginForm\"));
+            });
+
+            sock.onmessage = function(evt){
+                var obj = JSON.parse(evt.data);
+                console.log(JSON.stringify(obj));
+                if(obj.action == \"msg\"){
+                    chat.append(\"<p>\" + obj.user + \": \" + obj.msg + \"</p>\");
+                    chat.scrollTop(chat[0].scrollHeight);
+                }else if(obj.action == \"login\"){
+                    panel.append(\"<p>\" + obj.msg + \"</p>\");
+                }else if(obj.action == \"logout\"){
+                    panel.html(panel.html().replace(\"<p>\" + obj.msg + \"</p>\", \"\"));
+                }
+            };
+
+            $(\"#submit\").click(submit);
+            $(\"#form\").submit(submit);
+
+            $(\"#loginModal\").modal({backdrop: \"static\"});
+        });
     ",
     "css": "
         body {
             padding-top: 40px;
             background-color: #f5f5f5;
         }
-        .panel {
+        /*.panel {
             background-color: #555;
-        }
+        }*/
     ",
     "title": "ChatApp &middot; Chat Window"
 }
